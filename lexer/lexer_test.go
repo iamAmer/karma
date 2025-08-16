@@ -28,6 +28,8 @@ func TestNextToken(t *testing.T) {
 	for i, tt := range tests {
 		tok := l.NextToken()
 
+		t.Logf("Test %d: got token={Type:%s, Literal:%q}", i, tok.Type, tok.Literal)
+
 		if tok.Type != tt.expectedType {
 			t.Fatalf("tests[%d] - token type mismatch: expected=%q, got=%q", i, tt.expectedType, tok.Type)
 		}
