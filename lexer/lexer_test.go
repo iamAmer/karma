@@ -1,17 +1,21 @@
 package lexer
 
 import (
-	"testing"
 	"karma/token"
+	"testing"
 )
 
+type expectedToken struct {
+	expectedType    token.TokenType
+	expectedLiteral string
+}
+
 func TestNextToken(t *testing.T) {
+
+	// first input
 	input := `=+(){},;`
 
-	tests := []struct {
-		expectedType token.TokenType
-		expectedLiteral string
-	}{
+	tests := []expectedToken{
 		{token.ASSIGN, "="},
 		{token.PLUS, "+"},
 		{token.LPAREN, "("},
@@ -23,9 +27,64 @@ func TestNextToken(t *testing.T) {
 		{token.EOF, ""},
 	}
 
+	runLexerTest(t, input, tests)
+
+	// second input
+	input = `
+		let five = 5;
+		let ten = 10;
+		let add = fn(x, y) {
+		x + y;
+		};
+		let result = add(five, ten);
+	`
+	tests = []expectedToken{
+		{token.LET, "let"},
+		{token.IDENT, "five"},
+		{token.ASSIGN, "="},
+		{token.INT, "5"},
+		{token.SEMICOLON, ";"},
+		{token.LET, "let"},
+		{token.IDENT, "ten"},
+		{token.ASSIGN, "="},
+		{token.INT, "10"},
+		{token.SEMICOLON, ";"},
+		{token.LET, "let"},
+		{token.IDENT, "add"},
+		{token.ASSIGN, "="},
+		{token.FUNCTION, "fn"},
+		{token.LPAREN, "("},
+		{token.IDENT, "x"},
+		{token.COMMA, ","},
+		{token.IDENT, "y"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.IDENT, "x"},
+		{token.PLUS, "+"},
+		{token.IDENT, "y"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACE, "}"},
+		{token.SEMICOLON, ";"},
+		{token.LET, "let"},
+		{token.IDENT, "result"},
+		{token.ASSIGN, "="},
+		{token.IDENT, "add"},
+		{token.LPAREN, "("},
+		{token.IDENT, "five"},
+		{token.COMMA, ","},
+		{token.IDENT, "ten"},
+		{token.RPAREN, ")"},
+		{token.SEMICOLON, ";"},
+		{token.EOF, ""},
+	}
+
+	runLexerTest(t, input, tests)
+}
+
+func runLexerTest(t *testing.T, input string, expectedTokens []expectedToken) {
 	l := New(input)
 
-	for i, tt := range tests {
+	for i, tt := range expectedTokens {
 		tok := l.NextToken()
 
 		t.Logf("Test %d: got token={Type:%s, Literal:%q}", i, tok.Type, tok.Literal)
