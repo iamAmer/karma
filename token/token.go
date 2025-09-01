@@ -9,7 +9,7 @@ type Token struct {
 
 var keywords = map[string]TokenType {
 	"fun": FUNCTION,
-	"let": LET,
+	"karma": KARMA,
 	"true": TRUE,
 	"false": FALSE,
 	"if": IF,
@@ -46,7 +46,7 @@ const (
 
 	// keywords
 	FUNCTION = "FUNCTION"
-	LET = "LET"
+	KARMA = "KARMA"
 	TRUE = "TRUE"
 	FALSE = "FALSE"
 	IF = "IF"

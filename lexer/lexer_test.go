@@ -31,12 +31,12 @@ func TestNextToken(t *testing.T) {
 
 	// second input
 	input = `
-		let five = 5;
-		let ten = 10;
-		let add = fun(x, y) {
+		karma five = 5;
+		karma ten = 10;
+		karma add = fun(x, y) {
 		x + y;
 		};
-		let result = add(five, ten);
+		karma result = add(five, ten);
 
 		!-/*5;
 		5 < 10 > 5;
@@ -51,17 +51,17 @@ func TestNextToken(t *testing.T) {
 		10 != 9;
 	`
 	tests = []expectedToken{
-		{token.LET, "let"},
+		{token.KARMA, "karma"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.KARMA, "karma"},
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.KARMA, "karma"},
 		{token.IDENT, "add"},
 		{token.ASSIGN, "="},
 		{token.FUNCTION, "fun"},
@@ -77,7 +77,7 @@ func TestNextToken(t *testing.T) {
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.KARMA, "karma"},
 		{token.IDENT, "result"},
 		{token.ASSIGN, "="},
 		{token.IDENT, "add"},
