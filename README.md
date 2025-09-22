@@ -1,16 +1,15 @@
 # Karma
 
-My own interpreted programming language built in Go.
+Karma is my own interpreted programming language written in Go.  
 
-## Features
+## Structure
+- **lexer/** – breaks input into tokens
+- **token/** – defines the token types
+- **ast/** – abstract syntax tree nodes
+- **parser/** – builds AST from tokens
+- **repl/** – interactive read-eval-print loop
 
-- [ ] **C-like syntax**
-- [ ] **Variable bindings**
-- [ ] **Integers and booleans**
-- [ ] **Arithmetic expressions**
-- [ ] **Built-in functions**
-- [ ] **First-class and higher-order functions**
-- [ ] **Closures**
-- [ ] **String data structure**
-- [ ] **Array data structure**
-- [ ] **Hash data structure**
+## Current Progress
+- Tokens defined
+- Lexer implemented
+- Parser supports `karma` and `return` statements so far
