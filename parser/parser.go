@@ -13,6 +13,17 @@ import (
 	"karma/token"
 )
 
+const (	
+	_ int = iota
+	LOWEST
+	EQUALS // ==
+	LESSGREATER // > or <
+	SUM // +
+	PRODUCT // *
+	PREFIX // -X or !X
+	CALL // myFun(X)
+)
+
 // Parser represents the syntactic analyzer for the Karma language.
 type Parser struct {
 	l *lexer.Lexer
@@ -20,6 +31,9 @@ type Parser struct {
 	peekToken token.Token
 
 	errors []string
+
+	prefixParseFns map[token.TokenType]prefixParseFn
+	infixParseFns map[token.TokenType]infixParseFn
 }
 
 // New creates and returns a new Parser instance initialized with a given lexer.
@@ -31,9 +45,17 @@ func New(l *lexer.Lexer) *Parser {
 	
 	p.nextToken()
 	p.nextToken()
+	
+	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+	p.registerPrefix(token.IDENT, p.parseIdentifier)
 
 	return p
 }
+
+type (
+	prefixParseFn func() ast.Expression
+	infixParseFn func(ast.Expression) ast.Expression
+)
 
 // nextToken advances the parser’s tokens by one position.
 func (p *Parser) nextToken() {
@@ -61,7 +83,6 @@ func(p *Parser) expectedPeek(t token.TokenType) bool {
 		return false
 	}
 }
-
 
 // parseLetStatement parses a `let` statement of the form:
 //	karma <identifier> = <expression>;
@@ -102,6 +123,29 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	return stmt
 }
 
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+	prefix := p.prefixParseFns[p.curToken.Type]
+
+	if prefix == nil {
+		return nil
+	}
+
+	leftExp := prefix()
+	return leftExp
+}
+
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{Token: p.curToken}
+
+	stmt.Expression = p.parseExpression(LOWEST)
+
+	if p.peekTokenIS(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
 // parseStatement determines which type of statement the current token represents
 // and delegates to the appropriate parsing function.
 func (p *Parser) parseStatement() ast.Statement{
@@ -111,7 +155,7 @@ func (p *Parser) parseStatement() ast.Statement{
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default: 
-		return nil
+		return p.parseExpressionStatement()
 	}
 }
 
@@ -129,6 +173,18 @@ func (p *Parser) ParseProgram() *ast.Program {
 		p.nextToken()
 	}
 	return program
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+}
+
+func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
+	p.prefixParseFns[tokenType] = fn
+}
+
+func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
+	p.infixParseFns[tokenType] = fn
 }
 
 // Errors returns all syntax errors collected during parsing.func (p *Parser) Errors() []string {
